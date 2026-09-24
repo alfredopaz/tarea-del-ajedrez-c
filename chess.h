@@ -1,89 +1,43 @@
 #ifndef CHESS_H
 #define CHESS_H
 
-/*
- * This is the function you need to implement to display a picture on the 
- * screen. You should call the interpreter function within it only once, 
- * passing the picture as a string array. The string array must end with 
- * a '0' in the last position.
+/* Una imagen es un arreglo de cadenas de igual longitud, terminado en NULL.
+ * Las cadenas terminan en '\0'. Debe haber al menos una fila y una columna.
+ * Las funciones no modifican sus argumentos y siempre crean una imagen nueva.
+ * Retornan NULL y fijan errno: EINVAL (argumento/dimensiones/repeticiones
+ * inválidos), EOVERFLOW (tamaño no representable), ENOMEM (sin memoria).
+ * Las entradas deben ser arreglos válidos con sus terminadores.
+ *
+ * Memoria: el motor libera TODAS las imágenes creadas por la API al retornar
+ * display(). No usar free(), ni guardar resultados entre llamadas a display().
+ * Las figuras estáticas de figures.h permanecen disponibles.
  */
-void display();
 
-/*
- * Return a new picture, which is the original picture with reversed 
- * colors. The user is responsible for freeing the memory allocated for 
- * the string array (the picture).
- */
-char** reverse(char**);
+/* Implemente esta función y llame a interpreter una sola vez. */
+void display(void);
 
-/*
- * Return a new picture, placing the second picture to the right of the 
- * first. The new picture will have a width equal to the sum of both 
- * pictures' widths.
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** join(char**, char**);
+/* Intercambia '_' <-> '@', '.' <-> '#'; conserva espacios y '='. */
+char** reverse(char** fig);
+/* Une izquierda y derecha; exige igual número de filas. */
+char** join(char** left, char** right);
+/* Repite horizontalmente; n > 0. */
+char** repeatH(char** fig, int n);
+/* Coloca top encima de bottom; exige igual número de columnas. */
+char** up(char** top, char** bottom);
+/* Repite verticalmente; n > 0. */
+char** repeatV(char** fig, int n);
+/* Superpone front sobre back, de iguales dimensiones.
+ * Solo el espacio ' ' de front es transparente. */
+char** superImpose(char** front, char** back);
+/* Invierte el orden de las filas (arriba/abajo). */
+char** flipV(char** fig);
+/* Invierte el orden de las columnas (izquierda/derecha). */
+char** flipH(char** fig);
+/* Giros de 90 grados; intercambian alto y ancho. */
+char** rotateL(char** fig);
+char** rotateR(char** fig);
 
-/*
- * return a new picture, the original picture repeated a number of times 
- * on the side of each other
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** repeatH(char**, int);
+/* Dibuja la imagen; el espacio sin fondo se muestra gris. */
+void interpreter(char** fig);
 
-/*
- * return a new picture, the first one up to the second, the new picture will have 
- * the sum of hides from the both pictures.
- * The user must liberate the memory space reserved for the string array (the picture) 
- */
-char** up(char**, char**);
-
-/*
- * return a new picture, the original picture repeated a number of times 
- * down of each other
- * The user must liberate the memory space reserved for the string array (the picture) 
- */
-char** repeatV(char**, int);
-
-/*
- * return a new picture, the first picture over the second picture
- * The user must liberate the memory space reserved for the string array (the picture) 
- */
-char** superImpose(char**, char**);
-
-/*
- * return a new picture, the vertical mirror from the original picture
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** flipV(char**);
-
-/*
- * return a new picture, the horizontal mirror from the original the picture
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** flipH(char**);
-
-/*
- * return a new picture, the original picture rotated anti-clockwise
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** rotateL(char**);
-
-/*
- * return a new picture, the original picture rotated clockwise
- * The user must liberate the memory space reserved for the string array 
- * (the picture) 
- */
-char** rotateR(char**);
-
-/*
- * Do not try to implement this at home, unless the teacher authorizes it. 
- * It could be dangerous for your heatlh 
- */
-void interpreter(char**);
 #endif
