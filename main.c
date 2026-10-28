@@ -1,6 +1,8 @@
 #include "chess.h"
 #include "chess_internal.h"
+#ifndef CHESS_MANUAL_MEMORY
 #include "gc.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,10 +89,12 @@ void interpreter(char** fig){
 #endif
 }
 
-/* El alumno solo construye y dibuja; el motor gestiona la vida de las imágenes. */
+/* Etapa I: el motor recoge temporales. Etapa II: memoria manual del cliente. */
 static void render(void){
   display();
+#ifndef CHESS_MANUAL_MEMORY
   garbageCollector();
+#endif
 }
 
 #ifndef CHESS_HEADLESS
@@ -101,10 +105,12 @@ static void reshape(int width, int height){
 #endif
 
 int main(int argc, char** argv){
+#ifndef CHESS_MANUAL_MEMORY
   if(atexit(garbageCollector) != 0){
     fprintf(stderr, "No se pudo registrar la limpieza de memoria.\n");
     return EXIT_FAILURE;
   }
+#endif
 #ifdef CHESS_HEADLESS
   if(argc > 2){
     fprintf(stderr, "Uso: %s [salida.ppm]\n", argv[0]);

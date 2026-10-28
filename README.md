@@ -1,3 +1,96 @@
+# Ajedrez en C: dos tareas y una posible tercera etapa
+
+El proyecto conserva los archivos y los ejemplos originales. Se distingue
+**la biblioteca docente compilada** (`build/chess.o`) de **la implementación
+manual de los estudiantes** (`chess.c`). El proyecto también conserva
+`build/gc.o` para que la **primera** tarea funcione como antes.
+
+## Primera tarea: usar la API
+
+El estudiante recibe `chess.h`, las figuras y `build/chess.o` (sin `chess.c`).
+Compila sin gestionar la memoria de las composiciones:
+
+```sh
+make HW=ejemplo
+./ejemplo
+make headless HW=ejemplo
+./ejemplo-ppm tablero.ppm
+```
+
+El modo `reference` es el predeterminado, **incluso si en la versión docente
+existe chess.c**. De esta manera nunca se sobreescribe el `chess.o` original.
+
+## Segunda tarea: construir `chess.c` desde cero
+
+El profesor entrega las mismas cabeceras y el motor, pero el estudiante
+**crea `chess.c`** e implementa las DIEZ operaciones de `chess.h`.
+El archivo `chess.c` del ZIP es la **solución exclusiva del docente**:
+retírelo antes de distribuir la segunda tarea. Si también desea evitar
+que los estudiantes vean la solución, retire los ejecutables y otros archivos
+generados del profesor; no es necesario retirar los objetos originales.
+
+El código ya proporcionado es `invertColor()` y `chessDimensions()` en
+`chess_internal.h`, además del motor, las figuras y la biblioteca de la
+primera tarea. No se proporciona código de asignación/desasignación.
+
+La biblioteca manual utiliza exclusivamente `malloc()` y `free()` para
+sus imágenes, NO utiliza `gcAlloc()`, `gcTrackImage()` ni `garbageCollector()`.
+Cada operación retorna un arreglo nuevo, sin modificar ni liberar las entradas.
+El **llamador** libera cada fila recibida y luego el arreglo de punteros.
+Si falla una reserva parcial, la función que reservó los bloques debe
+liberarlos antes de retornar `NULL`. No se exige establecer `errno`.
+
+```sh
+make MODE=student HW=ejemplo
+./ejemplo-student
+make MODE=student headless HW=ejemplo
+./ejemplo-student-ppm salida.ppm
+```
+
+**Atención:** los ejemplos anidados de la primera tarea pueden presentar
+fugas en el modo `student`: fueron escritos suponiendo limpieza automática.
+Esto es el problema motivador para una futura tercera tarea; no significa
+que una operación individual esté implementada incorrectamente.
+
+### Pruebas funcionales y pruebas de memoria (segunda tarea)
+
+Las diez pruebas son independientes. Cada una usa **solo su operación**,
+destruye todas las imágenes reservadas y comprueba resultados,
+dimensiones, entradas intactas, resultados independientes y casos inválidos.
+
+```sh
+make test-func FUNC=reverse
+make test-func FUNC=rotateL
+make test-student
+make test-integration
+make test-failures
+make sanitize-func FUNC=reverse
+make sanitize-student
+make sanitize-integration
+make valgrind-func FUNC=rotateR
+make valgrind-student
+```
+
+`sanitize-func` usa AddressSanitizer/UndefinedBehaviorSanitizer y activa
+LeakSanitizer; `test-failures` simula fallos sucesivos de `malloc()` y
+verifica la liberación de las reservas parciales; `valgrind-func` detecta fugas en Ubuntu cuando Valgrind está
+instalado. Se ejecutan **sin OpenGL ni gc.o**. La prueba de integración
+construye un tablero con temporales nombrados y los libera uno por uno.
+
+`make test` conserva las pruebas originales asociadas a la biblioteca
+compilada de la **primera** tarea: esas pruebas usan su recolector y `errno`
+porque verifican el contrato de aquel objeto, no el de `chess.c`.
+
+## Tercera tarea (propuesta, NO implementada aquí)
+
+Una vez comprendida la dificultad de liberar los resultados temporales
+de expresiones anidadas, se puede introducir un recolector de basura.
+No es parte del trabajo de la segunda tarea.
+
+---
+
+## Información técnica original de la primera tarea
+
 # Ajedrez en C: composición de imágenes
 
 Proyecto docente para construir imágenes mediante la API de `chess.h`.

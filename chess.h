@@ -2,42 +2,41 @@
 #define CHESS_H
 
 /* Una imagen es un arreglo de cadenas de igual longitud, terminado en NULL.
- * Las cadenas terminan en '\0'. Debe haber al menos una fila y una columna.
- * Las funciones no modifican sus argumentos y siempre crean una imagen nueva.
- * Retornan NULL y fijan errno: EINVAL (argumento/dimensiones/repeticiones
- * inválidos), EOVERFLOW (tamaño no representable), ENOMEM (sin memoria).
- * Las entradas deben ser arreglos válidos con sus terminadores.
+ * Cada fila termina en '\0'; debe existir al menos una fila y una columna.
+ * Todas las operaciones devuelven una imagen NUEVA y no modifican sus
+ * argumentos. Devuelven NULL si los argumentos/dimensiones no son válidos,
+ * si hay desbordamiento de tamaños o si falla una reserva de memoria.
+ * No es necesario usar errno.
  *
- * Memoria: el motor libera TODAS las imágenes creadas por la API al retornar
- * display(). No usar free(), ni guardar resultados entre llamadas a display().
- * Las figuras estáticas de figures.h permanecen disponibles.
+ * Tarea 1: chess.o proporciona las operaciones. El motor libera sus resultados.
+ * Tarea 2: chess.c es implementado por el estudiante con malloc() y free().
+ *          El llamador debe liberar cada fila devuelta y finalmente el arreglo
+ *          de punteros. La biblioteca NO utiliza recolector de basura.
  */
 
-/* Implemente esta función y llame a interpreter una sola vez. */
 void display(void);
 
-/* Intercambia '_' <-> '@', '.' <-> '#'; conserva espacios y '='. */
+/* Cambia '_'<->'@' y '.'<->'#'; conserva espacios, '=' y otros caracteres. */
 char** reverse(char** fig);
-/* Une izquierda y derecha; exige igual número de filas. */
+/* Une left a la izquierda de right; requiere igual número de filas. */
 char** join(char** left, char** right);
-/* Repite horizontalmente; n > 0. */
+/* Repite la figura n veces horizontalmente; n > 0. */
 char** repeatH(char** fig, int n);
-/* Coloca top encima de bottom; exige igual número de columnas. */
+/* Coloca top encima de bottom; requiere igual número de columnas. */
 char** up(char** top, char** bottom);
-/* Repite verticalmente; n > 0. */
+/* Repite la figura n veces verticalmente; n > 0. */
 char** repeatV(char** fig, int n);
-/* Superpone front sobre back, de iguales dimensiones.
- * Solo el espacio ' ' de front es transparente. */
+/* Coloca front sobre back; ' ' es el único carácter transparente de front.
+ * Las dos figuras deben tener dimensiones idénticas. */
 char** superImpose(char** front, char** back);
-/* Invierte el orden de las filas (arriba/abajo). */
+/* Intercambia arriba y abajo. */
 char** flipV(char** fig);
-/* Invierte el orden de las columnas (izquierda/derecha). */
+/* Intercambia izquierda y derecha. */
 char** flipH(char** fig);
-/* Giros de 90 grados; intercambian alto y ancho. */
+/* Giros de 90 grados, que intercambian alto y ancho. */
 char** rotateL(char** fig);
 char** rotateR(char** fig);
 
-/* Dibuja la imagen; el espacio sin fondo se muestra gris. */
 void interpreter(char** fig);
 
 #endif
